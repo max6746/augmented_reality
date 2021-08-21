@@ -15,6 +15,9 @@ success, imgVideo = myVid.read()
 hT,wT,cT = imgTar.shape
 imgVideo = cv2.resize(imgVideo,(wT,hT))
 
+detection = False
+frameCounter = 0
+
 orb = cv2.ORB_create(nfeatures=1000)
 # kp1, des1 = orb.detectAndCompute(imgTarGry, None)
 # imgTarGry = cv2.drawKeypoints(imgTarGry,kp1,None)
@@ -62,6 +65,7 @@ def stackImages(imgArray,scale,lables=[]):
 
 
 while True:
+
     success, imgWebcam = cap.read()
     imgAug = imgWebcam.copy()
     # imgWebcamGry = cv2.cvtColor(imgWebcam, cv2.COLOR_BGR2GRAY)
@@ -69,6 +73,16 @@ while True:
     # imgWebcamGry = cv2.drawKeypoints(imgWebcamGry,kp2,None)
     kp2, des2 = orb.detectAndCompute(imgWebcam, None)
     imgWebcam = cv2.drawKeypoints(imgWebcam,kp2,None)
+
+    if detection == False:
+        myVid.set(cv2.CAP_PROP_POS_FRAMES, 0)
+        frameCounter = 0
+    else:
+        if frameCounter == myVid.get(cv2.CAP_PROP_FRAME_COUNT):
+            myVid.set(cv2.CAP_PROP_POS_FRAMES, 0)
+            frameCounter = 0
+        success, imgVideo = myVid.read()
+        imgVideo = cv2.resize(imgVideo,(wT,hT))
 
     bf = cv2.BFMatcher()
     matches = bf.knnMatch(des1, des2, k=2)
@@ -81,6 +95,7 @@ while True:
     imgFeatures = cv2.drawMatches(imgTar, kp1, imgWebcam, kp2, good, None, flags=2)
 
     if len(good) > 5:
+        detection = True
         srcPts = np.float32([kp1[m.queryIdx].pt for m in good]).reshape(-1,1,2)
         dstPts = np.float32([kp2[m.trainIdx].pt for m in good]).reshape(-1,1,2)
 
@@ -103,11 +118,12 @@ while True:
         imgStacked = stackImages(([imgWebcam, imgWarp], [imgWebcam, imgWarp]), 0.5)
 
     cv2.imshow('imgAug', imgAug)
-    cv2.imshow('imgWarp', imgWarp)
-    cv2.imshow('img2', img2)
-    cv2.imshow('imgFeatures', imgFeatures)
+    # cv2.imshow('imgWarp', imgWarp)
+    # cv2.imshow('img2', img2)
+    # cv2.imshow('imgFeatures', imgFeatures)
 
-    cv2.imshow('ImgTarget', imgTar)
-    cv2.imshow('myVid', imgVideo)
-    cv2.imshow('webcam', imgWebcam)
+    # cv2.imshow('ImgTarget', imgTar)
+    # cv2.imshow('myVid', imgVideo)
+    # cv2.imshow('webcam', imgWebcam)
     cv2.waitKey(1)
+    frameCounter += 1
