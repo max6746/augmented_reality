@@ -1,5 +1,13 @@
 import cv2
 import numpy as np
+import pyglet
+
+vid_path = 'video.mp4'
+player = pyglet.media.Player()
+MediaLoad = pyglet.media.load(vid_path)
+player.queue(MediaLoad)
+player.loop = True
+
 
 cap = cv2.VideoCapture(0)
 imgTar = cv2.imread('trgimg.jpg')
@@ -77,12 +85,17 @@ while True:
     if detection == False:
         myVid.set(cv2.CAP_PROP_POS_FRAMES, 0)
         frameCounter = 0
+        player.queue(MediaLoad)
+        player.play()
     else:
         if frameCounter == myVid.get(cv2.CAP_PROP_FRAME_COUNT):
             myVid.set(cv2.CAP_PROP_POS_FRAMES, 0)
             frameCounter = 0
+            player.queue(MediaLoad)
+            player.play()
         success, imgVideo = myVid.read()
         imgVideo = cv2.resize(imgVideo,(wT,hT))
+
 
     bf = cv2.BFMatcher()
     matches = bf.knnMatch(des1, des2, k=2)
