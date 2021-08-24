@@ -1,12 +1,17 @@
 import cv2
 import numpy as np
-import pyglet
+from pyglet.media import player
+from ffpyplayer.player import MediaPlayer
+# import pyglet
 
 vid_path = 'video.mp4'
-player = pyglet.media.Player()
-MediaLoad = pyglet.media.load(vid_path)
-player.queue(MediaLoad)
-player.loop = True
+
+# ff_opts = {'loop': 0, 'sync': 'video'}
+
+# player = pyglet.media.Player()
+# MediaLoad = pyglet.media.load(vid_path)
+# player.queue(MediaLoad)
+# player.loop = True
 
 
 cap = cv2.VideoCapture(0)
@@ -34,7 +39,7 @@ kp1, des1 = orb.detectAndCompute(imgTar, None)
 imgTar = cv2.drawKeypoints(imgTar,kp1,None)
 
 while True:
-
+    
     success, imgWebcam = cap.read()
     imgAug = imgWebcam.copy()
     # imgWebcamGry = cv2.cvtColor(imgWebcam, cv2.COLOR_BGR2GRAY)
@@ -46,14 +51,14 @@ while True:
     if detection == False:
         myVid.set(cv2.CAP_PROP_POS_FRAMES, 0)
         frameCounter = 0
-        player.queue(MediaLoad)
-        player.play()
+        # player.queue(MediaLoad)
+        # player.play()
     else:
         if frameCounter == myVid.get(cv2.CAP_PROP_FRAME_COUNT):
             myVid.set(cv2.CAP_PROP_POS_FRAMES, 0)
             frameCounter = 0
-            player.queue(MediaLoad)
-            player.play()
+            # player.queue(MediaLoad)
+            # player.play()
         success, imgVideo = myVid.read()
         imgVideo = cv2.resize(imgVideo,(wT,hT))
 
@@ -88,6 +93,9 @@ while True:
         maskInv = cv2.bitwise_not(maskNew)
         imgAug = cv2.bitwise_and(imgAug, imgAug, mask=maskInv)
         imgAug = cv2.bitwise_or(imgWarp, imgAug)
+        # player = MediaPlayer(vid_path,ff_opts=ff_opts)
+        player = MediaPlayer(vid_path)
+        # audio_frame, val = player.get_frame()
 
         # imgStacked = stackImages(([imgWebcam, imgWarp], [imgWebcam, imgWarp]), 0.5)
 
