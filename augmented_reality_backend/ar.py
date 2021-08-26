@@ -1,18 +1,19 @@
 import cv2
 import numpy as np
-from pyglet.media import player
-from ffpyplayer.player import MediaPlayer
-# import pyglet
+# from pyglet.media import player
+# from ffpyplayer.player import MediaPlayer
+# from imutils.video import FPS
+import pyglet
 
 vid_path = 'video.mp4'
 
 # ff_opts = {'loop': 0, 'sync': 'video'}
 
-# player = pyglet.media.Player()
-# MediaLoad = pyglet.media.load(vid_path)
-# player.queue(MediaLoad)
-# player.loop = True
-
+player = pyglet.media.Player()
+MediaLoad = pyglet.media.load(vid_path)
+player.queue(MediaLoad)
+player.loop = True
+# player = MediaPlayer(vid_path)
 
 cap = cv2.VideoCapture(0)
 imgTar = cv2.imread('trgimg.jpg')
@@ -22,6 +23,8 @@ imgTar = cv2.imread('trgimg.jpg')
 
 
 myVid = cv2.VideoCapture('video.mp4')
+print(myVid.get(cv2.CAP_PROP_FPS))
+myVid.set(cv2.CAP_PROP_BUFFERSIZE, 30)
 
 
 success, imgVideo = myVid.read()
@@ -57,7 +60,8 @@ while True:
         if frameCounter == myVid.get(cv2.CAP_PROP_FRAME_COUNT):
             myVid.set(cv2.CAP_PROP_POS_FRAMES, 0)
             frameCounter = 0
-            # player.queue(MediaLoad)
+
+            print("end video")
             # player.play()
         success, imgVideo = myVid.read()
         imgVideo = cv2.resize(imgVideo,(wT,hT))
@@ -69,7 +73,7 @@ while True:
     for m,n in matches:
         if m.distance < 0.75*n.distance:
             good.append(m)
-    print(len(good))
+    # print(len(good))
     # imgFeatures = cv2.drawMatches(imgTarGry, kp1, imgWebcamGry, kp2, good, None, flags=2)
     imgFeatures = cv2.drawMatches(imgTar, kp1, imgWebcam, kp2, good, None, flags=2)
 
@@ -80,7 +84,7 @@ while True:
 
         # matrix, mask = cv2.findHomography(srcPts, dstPts, cv2.RANSAC, 2)
         matrix, mask = cv2.findHomography(srcPts, dstPts, cv2.LMEDS)
-        print(matrix)
+        # print(matrix)
 
         pts = np.float32([[0,0], [0,hT], [wT,hT], [wT,0]]).reshape(-1,1,2)
         dst = cv2.perspectiveTransform(pts, matrix)
@@ -94,12 +98,15 @@ while True:
         imgAug = cv2.bitwise_and(imgAug, imgAug, mask=maskInv)
         imgAug = cv2.bitwise_or(imgWarp, imgAug)
         # player = MediaPlayer(vid_path,ff_opts=ff_opts)
-        player = MediaPlayer(vid_path)
-        # audio_frame, val = player.get_frame()
+
+        
+
+        # player = MediaPlayer(vid_path)
 
         # imgStacked = stackImages(([imgWebcam, imgWarp], [imgWebcam, imgWarp]), 0.5)
-
+    player.play()
     cv2.imshow('imgAug', imgAug)
+ 
     # cv2.imshow('imgWarp', imgWarp)
     # cv2.imshow('img2', img2)
     # cv2.imshow('imgFeatures', imgFeatures)
@@ -109,3 +116,4 @@ while True:
     # cv2.imshow('webcam', imgWebcam)
     cv2.waitKey(1)
     frameCounter += 1
+
