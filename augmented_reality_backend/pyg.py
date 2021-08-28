@@ -6,7 +6,7 @@ player = pyglet.media.Player()
 # source = pyglet.media.StreamingSource()
 MediaLoad = pyglet.media.load(vid_path)
 player.on_eos()
-player.loop = True
+# player.loop = True
 player.queue(MediaLoad)
 player.play()
 

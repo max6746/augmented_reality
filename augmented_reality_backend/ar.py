@@ -4,6 +4,7 @@ import numpy as np
 # from ffpyplayer.player import MediaPlayer
 # from imutils.video import FPS
 import pyglet
+import time
 
 vid_path = 'video.mp4'
 
@@ -13,6 +14,7 @@ player = pyglet.media.Player()
 MediaLoad = pyglet.media.load(vid_path)
 player.queue(MediaLoad)
 player.loop = True
+player.on_eos()
 # player = MediaPlayer(vid_path)
 
 cap = cv2.VideoCapture(0)
@@ -40,6 +42,8 @@ orb = cv2.ORB_create(nfeatures=1000)
 
 kp1, des1 = orb.detectAndCompute(imgTar, None)
 imgTar = cv2.drawKeypoints(imgTar,kp1,None)
+prev_frame_time = 0
+new_frame_time = 0
 
 while True:
     
@@ -104,7 +108,17 @@ while True:
         # player = MediaPlayer(vid_path)
 
         # imgStacked = stackImages(([imgWebcam, imgWarp], [imgWebcam, imgWarp]), 0.5)
-    player.play()
+    # player.play()
+
+    #check fps
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    new_frame_time = time.time()
+    fps = 1/(new_frame_time-prev_frame_time)
+    prev_frame_time = new_frame_time
+    fps = str(int(fps))
+    cv2.putText(imgAug, fps,(7, 70), font, 3, (100, 255, 0), 3, cv2.LINE_AA)
+    ####
+    
     cv2.imshow('imgAug', imgAug)
  
     # cv2.imshow('imgWarp', imgWarp)
