@@ -10,3 +10,8 @@
 - numpy
 - pyglet
 - ffpyplayer
+
+## TODO
+Backing off the idea of Video (frames with audio). Sticking with GIF (JIF)
+- Fix audio issues
+- sync video with audio
